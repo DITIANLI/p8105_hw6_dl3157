@@ -72,6 +72,16 @@ city_result =
 ```
 
 ```{r}
+city_result %>% 
+  ggplot(aes(x = reorder(city_state, OR), y = OR)) +
+    geom_point() +
+    geom_errorbar(aes(ymin = CI_low, ymax = CI_up)) +
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.3, size = 8)) +
+    labs(
+      x = "City",
+      y = "OR",
+      title = "Estimated OR for Solving Homicides Comparing Non-white Victims to White Victims"
+    )
 
 ```
 
@@ -86,4 +96,20 @@ birthweight<- read_csv("./data/birthweight.csv") %>%
          mrace = as.factor(mrace))
 
 ```
+
+
+```{r}
+fit_null = lm(bwt ~ 1, data = birthweight)
+fit_alt = lm(bwt ~ .,data = birthweight)
+summary(fit_null)
+summary(fit_alt)
+```
+
+```{r}
+library(MASS)
+step.model <- stepAIC(fit_alt,direction ="both", trace = FALSE)
+summary(step.model)
+```
+
+
 
