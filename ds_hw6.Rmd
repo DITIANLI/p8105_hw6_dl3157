@@ -7,5 +7,47 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(stringr)
+library(leaps)
+library(broom)
+library(mgcv)
+library(modelr)
+library(knitr)
+```
+
+```{r}
+homicide <- 
+  read_csv("./data/homicide-data.csv") %>% 
+  janitor::clean_names()
+homicide 
+
+homicide1 <- 
+  homicide %>% 
+  mutate(city_state = str_c(city, state, sep = ", "),
+         resolved = as.numeric(disposition == "Closed by arrest")) %>% 
+  filter(!city_state %in% c("Dallas,TX","Phoenix,AZ", "Kansas City,MO", "Tulsa,AL")) %>%
+  filter(victim_race != "Unkonwn") %>% 
+  mutate(victim_race = fct_relevel(ifelse(victim_race == "White", "white", "non-white"), "white")) %>%
+  mutate(victim_age = as.numeric(victim_age))
+homicide1
+```
+```{r}
+balt <- homicide1 %>% 
+  filter(city_state == "Baltimore, MD")
+
+fit <- glm(resolved ~ victim_age + victim_sex + victim_race, data = balt, family = binomial()) %>% 
+  broom::tidy()
+fit
+```
+
+```{r}
+fit %>% 
+  broom::tidy() %>% 
+  mutate(OR = exp(estimate),
+         lower_bound = exp(estimate - std.error*1.96),
+         upper_bound = exp(estimate + std.error*1.96)) %>%
+  select(term, log_OR = estimate, OR, lower_bound, upper_bound, p.value) %>% 
+  knitr::kable(digits = 3)
 ```
 
