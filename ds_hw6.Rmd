@@ -42,12 +42,48 @@ fit
 ```
 
 ```{r}
-fit %>% 
-  broom::tidy() %>% 
+fit <- fit %>% 
   mutate(OR = exp(estimate),
-         lower_bound = exp(estimate - std.error*1.96),
-         upper_bound = exp(estimate + std.error*1.96)) %>%
-  select(term, log_OR = estimate, OR, lower_bound, upper_bound, p.value) %>% 
-  knitr::kable(digits = 3)
+         CI_low = exp(estimate - std.error*1.96),
+         CI_up = exp(estimate + std.error*1.96)) %>% 
+  dplyr::select(term, estimate, OR, CI_low, CI_up) %>% 
+    knitr::kable(digits = 2)
+fit
+```
+
+```{r}
+city_logistic = function(x){
+  
+    homicide1 %>% 
+    filter(city_state == x) %>% 
+    glm(resolved ~ victim_age + victim_sex + victim_race, data = ., family = binomial())  %>% 
+    broom::tidy() %>% 
+    mutate(OR = exp(estimate),
+           CI_low = exp(estimate - 1.96 * std.error),
+           CI_up = exp(estimate + 1.96 * std.error)) %>% 
+    filter(term == "victim_racenon-white") %>% 
+    select(beta = estimate, p.value, OR, CI_low,CI_up)
+}
+
+city_result = 
+  tibble(city_state = unique(homicide1$city_state)) %>% 
+  mutate(map(.x = unique(homicide1$city_state), ~city_logistic(.x))) %>% 
+  unnest
+```
+
+```{r}
+
+```
+
+Problem 2
+```{r}
+birthweight<- read_csv("./data/birthweight.csv") %>% 
+  janitor::clean_names() %>% 
+  na.omit() %>% 
+  mutate(babysex = as.factor(babysex),
+         frace = as.factor(frace),
+         malform = as.factor(malform),
+         mrace = as.factor(mrace))
+
 ```
 
