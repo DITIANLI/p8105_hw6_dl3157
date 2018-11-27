@@ -21,6 +21,10 @@ theme_set(theme_bw())
 set.seed(1)
 ```
 
+#Problem 1
+
+Create a city_state variable (e.g. “Baltimore, MD”), and a binary variable indicating whether the homicide is solved. Omit cities Dallas, TX; Phoenix, AZ; and Kansas City, MO – these don’t report victim race. Also omit Tulsa, AL – this is a data entry mistake. Modifiy victim_race to have categories white and non-white, with white as the reference category. 
+
 ```{r}
 homicide <- 
   read_csv("./data/homicide-data.csv") %>% 
@@ -38,6 +42,9 @@ homicide1 <-
   select(uid, victim_race, victim_age, victim_sex, city_state, resolved)
 homicide1
 ```
+
+For the city of Baltimore, MD, use the glm function to fit a logistic regression with resolved vs unresolved as the outcome and victim age, sex and race (as just defined) as predictors.
+
 ```{r}
 balt <- homicide1 %>% 
   filter(city_state == "Baltimore, MD")
@@ -45,8 +52,10 @@ balt <- homicide1 %>%
 fit <- glm(resolved ~ victim_age + victim_sex + victim_race, data = balt, family = binomial()) %>% 
   broom::tidy()
 fit
-```
 
+save(fit,file = "fit_glm.RData") #Save the output of glm as an R object
+```
+Obtain the estimate and confidence interval of the adjusted odds ratio for solving homicides comparing non-white victims to white victims keeping all other variables fixed.
 ```{r}
 fit <- fit %>% 
   mutate(OR = exp(estimate),
@@ -56,6 +65,10 @@ fit <- fit %>%
     knitr::kable(digits = 2)
 fit
 ```
+
+Comment:The estimate OR for race is 0.44(95%CI:0.31,0.62). Interpretation: the odds of resolving the case for non-white people is 0.441 times the odds compared to white people. 
+
+Run glm for each of the cities in your dataset, and extract the adjusted odds ratio (and CI) for solving homicides comparing non-white victims to white victims. 
 
 ```{r}
 city_logistic = function(x){
@@ -77,6 +90,7 @@ city_result =
   unnest
 ```
 
+Create a plot that shows the estimated ORs and CIs for each city.
 ```{r}
 city_result %>% 
   ggplot(aes(x = reorder(city_state, OR), y = OR)) +
@@ -91,7 +105,12 @@ city_result %>%
 
 ```
 
-Problem 2
+Comment: The OR differs from state to state, but the mean odds ratio of solving for a non-white victim case compared to white victime is less than 1, which means
+non-white victim cases are more likely to be unsolved.
+
+
+
+#Problem 2
 ```{r}
 birthweight<- read_csv("./data/birthweight.csv") 
 
