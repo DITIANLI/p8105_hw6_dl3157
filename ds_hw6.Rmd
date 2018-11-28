@@ -137,6 +137,7 @@ backward %>%
 ```
 Using backward method to select model.
 
+Model selection:
 ```{r}
 my_model = lm(bwt ~ babysex + bhead + blength + gaweeks + mheight + mrace + parity + smoken,data = birthweight)
 summary(my_model)
