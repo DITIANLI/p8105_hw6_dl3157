@@ -165,7 +165,7 @@ city_result %>%
     )
 ```
 
-<img src="ds_hw6_files/figure-markdown_github/unnamed-chunk-5-1.png" width="90%" />
+<img src="ds_hw6_files/figure-markdown_github/1_4-1.png" width="90%" />
 
 Comment: The OR differs from state to state, but the mean odds ratio of solving for a non-white victim case compared to white victime is less than 1, which means non-white victim cases are more likely to be unsolved. Boston has the smallest OR, Tampa has the largest OR, Durham has the largest CI.
 
@@ -276,6 +276,8 @@ describe(birthweight)
 
 Use psych package to check distributions, pnumlbw and pnumsga are all zero, and other variables do not have missing data.
 
+Using backward method to select model
+
 ``` r
 fit_full = lm(bwt ~ .,data = birthweight)
 backward<-step(fit_full, direction="backward",trace = 0)
@@ -285,23 +287,22 @@ backward %>%
   knitr::kable(digit = 2)
 ```
 
-| term           |   estimate|     std.error|  statistic|  p.value|
-|:---------------|----------:|-------------:|----------:|--------:|
-| (Intercept)    |   -6246.37|        143.13|     -43.64|     0.00|
-| babysex        |      32.32|          8.55|       3.78|     0.00|
-| bhead          |     134.43|          3.47|      38.76|     0.00|
-| blength        |      76.38|          2.04|      37.48|     0.00|
-| delwt          |       3.96|          0.40|       9.93|     0.00|
-| fincome        |       0.66|          0.18|       3.72|     0.00|
-| gaweeks        |      12.04|          1.48|       8.13|     0.00|
-| menarche       |      -4.31|          2.92|      -1.48|     0.14|
-| mheight        |       5.44|          1.81|       3.00|     0.00|
-| momage         |       3.45|          1.19|       2.90|     0.00|
-| mrace          |     -53.50|          6.02|      -8.89|     0.00|
-| parity         |      89.97|         40.91|       2.20|     0.03|
-| ppwt           |      -2.83|          0.44|      -6.49|     0.00|
-| smoken         |      -3.71|          0.58|      -6.38|     0.00|
-| Using backward |  method to|  select model|          .|         |
+| term        |  estimate|  std.error|  statistic|  p.value|
+|:------------|---------:|----------:|----------:|--------:|
+| (Intercept) |  -6246.37|     143.13|     -43.64|     0.00|
+| babysex     |     32.32|       8.55|       3.78|     0.00|
+| bhead       |    134.43|       3.47|      38.76|     0.00|
+| blength     |     76.38|       2.04|      37.48|     0.00|
+| delwt       |      3.96|       0.40|       9.93|     0.00|
+| fincome     |      0.66|       0.18|       3.72|     0.00|
+| gaweeks     |     12.04|       1.48|       8.13|     0.00|
+| menarche    |     -4.31|       2.92|      -1.48|     0.14|
+| mheight     |      5.44|       1.81|       3.00|     0.00|
+| momage      |      3.45|       1.19|       2.90|     0.00|
+| mrace       |    -53.50|       6.02|      -8.89|     0.00|
+| parity      |     89.97|      40.91|       2.20|     0.03|
+| ppwt        |     -2.83|       0.44|      -6.49|     0.00|
+| smoken      |     -3.71|       0.58|      -6.38|     0.00|
 
 ``` r
 my_model = lm(bwt ~ babysex + bhead + blength + gaweeks + mheight + mrace + parity + smoken,data = birthweight)
@@ -340,7 +341,7 @@ par(mfrow = c(2,2))#check assumption
 plot(my_model)
 ```
 
-<img src="ds_hw6_files/figure-markdown_github/unnamed-chunk-8-1.png" width="90%" />
+<img src="ds_hw6_files/figure-markdown_github/2_2-1.png" width="90%" />
 
 According to article'European Journal of Obstetrics & Gynecology and Reproductive Biology' and 'Maternal pregravid weight, age, and smoking status as risk factors for low birth weight births' and from the result of backward selection, we finally decide to choose babysex, bhead, blength, gaweeks, mheight, mrace, parity and smoken as predictors in our final model. Q-Q plot is roughly linear, the assumption is not violated.
 
@@ -357,7 +358,7 @@ birthweight %>%
    )
 ```
 
-<img src="ds_hw6_files/figure-markdown_github/unnamed-chunk-9-1.png" width="90%" />
+<img src="ds_hw6_files/figure-markdown_github/2_3-1.png" width="90%" />
 
 Comment: the residuals are clusteredd, we need to revise the model.
 
@@ -452,6 +453,6 @@ cv_compare %>%
    )
 ```
 
-<img src="ds_hw6_files/figure-markdown_github/unnamed-chunk-12-1.png" width="90%" />
+<img src="ds_hw6_files/figure-markdown_github/2_6-1.png" width="90%" />
 
 Comment: Based on the RMSE, the my\_model have the least mean rmse and least error variance across these three models. The first model with only parameters in linear form has the least predictive ability. The second model involving main effect of baby head circumference, body length, babysex and their interactions have better predictive capability than the first one.

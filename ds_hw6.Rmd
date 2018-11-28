@@ -25,7 +25,7 @@ set.seed(1)
 
 Create a city_state variable, and a binary variable indicating whether the homicide is solved. Omit cities Dallas, TX; Phoenix, AZ; and Kansas City, MO, these do not report victim race. Also omit Tulsa, AL this is a data entry mistake. Modifiy victim_race to have categories white and non-white, with white as the reference category. 
 
-```{r}
+```{r 1}
 homicide <- 
   read_csv("./data/homicide-data.csv") %>% 
   janitor::clean_names()
@@ -45,7 +45,7 @@ homicide1
 
 For the city of Baltimore, MD, use the glm function to fit a logistic regression with resolved vs unresolved as the outcome and victim age, sex and race (as just defined) as predictors.
 
-```{r}
+```{r 1_1}
 balt <- homicide1 %>% 
   filter(city_state == "Baltimore, MD")
 
@@ -56,7 +56,7 @@ fit
 save(fit,file = "fit_glm.RData") #Save the output of glm as an R object
 ```
 Obtain the estimate and confidence interval of the adjusted odds ratio for solving homicides comparing non-white victims to white victims keeping all other variables fixed.
-```{r}
+```{r 1_2}
 fit <- fit %>% 
   mutate(OR = exp(estimate),
          CI_low = exp(estimate - std.error*1.96),
@@ -71,7 +71,7 @@ Comment:The estimate OR for race is 0.44(95%CI:0.31,0.62). Interpretation: the o
 
 Run glm for each of the cities in your dataset, and extract the adjusted odds ratio (and CI) for solving homicides comparing non-white victims to white victims. 
 
-```{r}
+```{r 1_3}
 city_logistic = function(x){
   
     homicide1 %>% 
@@ -92,7 +92,7 @@ city_result =
 ```
 
 Create a plot that shows the estimated ORs and CIs for each city.
-```{r}
+```{r 1_4}
 city_result %>% 
   ggplot(aes(x = reorder(city_state, OR), y = OR)) +
     geom_point() +
@@ -112,7 +112,7 @@ Boston has the smallest OR, Tampa has the largest OR, Durham has the largest CI.
 
 #Problem 2
 In this probelm, we analyzed data gathered to understand the effects of several variables on a child’s birthweight.
-```{r}
+```{r 2}
 birthweight<- read_csv("./data/birthweight.csv") 
 
 birthweight%>% 
@@ -127,7 +127,8 @@ describe(birthweight)
 ```
 Use psych package to check distributions, pnumlbw and pnumsga are all zero, and other variables do not have missing data.
 
-```{r}
+Using backward method to select model
+```{r 2_1}
 fit_full = lm(bwt ~ .,data = birthweight)
 backward<-step(fit_full, direction="backward",trace = 0)
 
@@ -135,10 +136,9 @@ backward %>%
   broom::tidy() %>% 
   knitr::kable(digit = 2)
 ```
-Using backward method to select model.
 
-Model selection:
-```{r}
+
+```{r 2_2}
 my_model = lm(bwt ~ babysex + bhead + blength + gaweeks + mheight + mrace + parity + smoken,data = birthweight)
 summary(my_model)
 
@@ -150,7 +150,7 @@ According to article'European Journal of Obstetrics & Gynecology and Reproductiv
 mheight, mrace, parity and smoken as predictors in our final model.
 Q-Q plot is roughly linear, the assumption is not violated.
 
-```{r}
+```{r 2_3}
 birthweight %>% 
   add_residuals(my_model) %>% 
   add_predictions(my_model) %>% 
@@ -165,7 +165,7 @@ birthweight %>%
 
 Comment: the residuals are clusteredd, we need to revise the model.
 
-```{r}
+```{r 2_4}
 model1 <- lm(bwt ~ blength + gaweeks, data = birthweight)
 summary(model1)
 model2<- lm(bwt ~ bhead + blength + babysex + bhead*babysex + bhead*blength + blength*babysex + bhead*babysex*blength, data = birthweight)
@@ -173,7 +173,7 @@ summary(model2)
 
 ```
 
-```{r}
+```{r 2_5}
 cv <- birthweight %>% 
   crossv_mc(100)
 
@@ -187,7 +187,7 @@ cv_compare<-cv %>%
          rmse_model2 = map2_dbl(model2, test, ~rmse(.x, .y)))
 ```
 
-```{r}
+```{r 2_6}
 cv_compare %>% 
   dplyr::select(starts_with('rmse')) %>% 
   gather(key = model, value = rmse, rmse_my_model:rmse_model2) %>%  
