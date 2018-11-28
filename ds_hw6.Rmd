@@ -196,4 +196,5 @@ cv_compare %>%
    )
 ```
 
+
 Comment: Based on the RMSE, the my_model have the least mean rmse and least error variance across these three models. The first model with only parameters in linear form has the least predictive ability. The second model involving main effect of baby head circumference, body length, babysex and their interactions have better predictive capability than the first one.

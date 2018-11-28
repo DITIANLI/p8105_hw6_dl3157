@@ -446,4 +446,6 @@ cv_compare %>%
    )
 ```
 
-<img src="ds_hw6_files/figure-markdown_github/unnamed-chunk-12-1.png" width="90%" /> Comment: Based on the RMSE, the my\_model have the least mean rmse and least error variance across these three models. The first model with only parameters in linear form has the least predictive ability. The second model involving main effect of baby head circumference, body length, babysex and their interactions have better predictive capability than the first one.
+<img src="ds_hw6_files/figure-markdown_github/unnamed-chunk-12-1.png" width="90%" />
+
+Comment: Based on the RMSE, the my\_model have the least mean rmse and least error variance across these three models. The first model with only parameters in linear form has the least predictive ability. The second model involving main effect of baby head circumference, body length, babysex and their interactions have better predictive capability than the first one.
