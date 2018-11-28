@@ -278,24 +278,30 @@ Use psych package to check distributions, pnumlbw and pnumsga are all zero, and 
 
 ``` r
 fit_full = lm(bwt ~ .,data = birthweight)
-step(fit_full, direction="backward",trace = 0)
+backward<-step(fit_full, direction="backward",trace = 0)
+
+backward %>% 
+  broom::tidy() %>% 
+  knitr::kable(digit = 2)
 ```
 
-    ## 
-    ## Call:
-    ## lm(formula = bwt ~ babysex + bhead + blength + delwt + fincome + 
-    ##     gaweeks + menarche + mheight + momage + mrace + parity + 
-    ##     ppwt + smoken, data = birthweight)
-    ## 
-    ## Coefficients:
-    ## (Intercept)      babysex        bhead      blength        delwt  
-    ##  -6246.3672      32.3171     134.4298      76.3760       3.9564  
-    ##     fincome      gaweeks     menarche      mheight       momage  
-    ##      0.6597      12.0396      -4.3140       5.4408       3.4549  
-    ##       mrace       parity         ppwt       smoken  
-    ##    -53.4990      89.9677      -2.8323      -3.7116
-
-Using backward method to select model.
+| term           |   estimate|     std.error|  statistic|  p.value|
+|:---------------|----------:|-------------:|----------:|--------:|
+| (Intercept)    |   -6246.37|        143.13|     -43.64|     0.00|
+| babysex        |      32.32|          8.55|       3.78|     0.00|
+| bhead          |     134.43|          3.47|      38.76|     0.00|
+| blength        |      76.38|          2.04|      37.48|     0.00|
+| delwt          |       3.96|          0.40|       9.93|     0.00|
+| fincome        |       0.66|          0.18|       3.72|     0.00|
+| gaweeks        |      12.04|          1.48|       8.13|     0.00|
+| menarche       |      -4.31|          2.92|      -1.48|     0.14|
+| mheight        |       5.44|          1.81|       3.00|     0.00|
+| momage         |       3.45|          1.19|       2.90|     0.00|
+| mrace          |     -53.50|          6.02|      -8.89|     0.00|
+| parity         |      89.97|         40.91|       2.20|     0.03|
+| ppwt           |      -2.83|          0.44|      -6.49|     0.00|
+| smoken         |      -3.71|          0.58|      -6.38|     0.00|
+| Using backward |  method to|  select model|          .|         |
 
 ``` r
 my_model = lm(bwt ~ babysex + bhead + blength + gaweeks + mheight + mrace + parity + smoken,data = birthweight)

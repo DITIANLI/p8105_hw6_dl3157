@@ -129,7 +129,11 @@ Use psych package to check distributions, pnumlbw and pnumsga are all zero, and 
 
 ```{r}
 fit_full = lm(bwt ~ .,data = birthweight)
-step(fit_full, direction="backward",trace = 0)
+backward<-step(fit_full, direction="backward",trace = 0)
+
+backward %>% 
+  broom::tidy() %>% 
+  knitr::kable(digit = 2)
 ```
 Using backward method to select model.
 
