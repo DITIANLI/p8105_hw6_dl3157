@@ -68,6 +68,7 @@ fit
 
 Comment:The estimate OR for race is 0.44(95%CI:0.31,0.62). Interpretation: the odds of resolving the case for non-white people is 0.441 times the odds compared to white people. 
 
+
 Run glm for each of the cities in your dataset, and extract the adjusted odds ratio (and CI) for solving homicides comparing non-white victims to white victims. 
 
 ```{r}
@@ -106,11 +107,11 @@ city_result %>%
 ```
 
 Comment: The OR differs from state to state, but the mean odds ratio of solving for a non-white victim case compared to white victime is less than 1, which means non-white victim cases are more likely to be unsolved.
-Boston has the smallest OR, Tampa has the largest OR.
-
+Boston has the smallest OR, Tampa has the largest OR, Durham has the largest CI.
 
 
 #Problem 2
+In this probelm, we analyzed data gathered to understand the effects of several variables on a child’s birthweight.
 ```{r}
 birthweight<- read_csv("./data/birthweight.csv") 
 
@@ -124,18 +125,13 @@ birthweight%>%
 library(psych)
 describe(birthweight)
 ```
-
+Use psych package to check distributions, pnumlbw and pnumsga are all zero, and other variables do not have missing data.
 
 ```{r}
 fit_full = lm(bwt ~ .,data = birthweight)
-summary(fit_full)
+step(fit_full, direction="backward",trace = 0)
 ```
-
-```{r}
-library(MASS)
-step.model <- step(fit_full,direction =c("both"), trace = FALSE)
-summary(step.model)
-```
+Using backward method to select model.
 
 ```{r}
 my_model = lm(bwt ~ babysex + bhead + blength + gaweeks + mheight + mrace + parity + smoken,data = birthweight)
@@ -144,6 +140,11 @@ summary(my_model)
 par(mfrow = c(2,2))#check assumption
 plot(my_model)
 ```
+
+According to article'European Journal of Obstetrics & Gynecology and Reproductive Biology' and 'Maternal pregravid weight, age, and smoking status as risk factors for low birth weight births' and from the result of backward selection, we finally decide to choose babysex, bhead, blength, gaweeks, 
+mheight, mrace, parity and smoken as predictors in our final model.
+Q-Q plot is roughly linear, the assumption is not violated.
+
 ```{r}
 birthweight %>% 
   add_residuals(my_model) %>% 
@@ -157,6 +158,8 @@ birthweight %>%
    )
 ```
 
+Comment: the residuals are clusteredd, we need to revise the model.
+
 ```{r}
 model1 <- lm(bwt ~ blength + gaweeks, data = birthweight)
 summary(model1)
@@ -164,6 +167,7 @@ model2<- lm(bwt ~ bhead + blength + babysex + bhead*babysex + bhead*blength + bl
 summary(model2)
 
 ```
+
 ```{r}
 cv <- birthweight %>% 
   crossv_mc(100)
@@ -191,4 +195,4 @@ cv_compare %>%
      y = "RMSE"
    )
 ```
-
+Comment: Based on the RMSE, the my_model have the least mean rmse and least error variance across these three models. The first model with only parameters in linear form has the least predictive ability. The second model involving main effect of baby head circumference, body length, babysex and their interactions have better predictive capability than the first one.

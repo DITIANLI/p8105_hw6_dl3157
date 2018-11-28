@@ -3,6 +3,11 @@ ds\_hw6
 DITIANLI
 November 25, 2018
 
+Problem 1
+=========
+
+Create a city\_state variable, and a binary variable indicating whether the homicide is solved. Omit cities Dallas, TX; Phoenix, AZ; and Kansas City, MO, these do not report victim race. Also omit Tulsa, AL this is a data entry mistake. Modifiy victim\_race to have categories white and non-white, with white as the reference category.
+
 ``` r
 homicide <- 
   read_csv("./data/homicide-data.csv") %>% 
@@ -79,6 +84,8 @@ homicide1
     ## 10 Alb-000010 non-white           43 Male       Albuquerque, NM        0
     ## # ... with 48,497 more rows
 
+For the city of Baltimore, MD, use the glm function to fit a logistic regression with resolved vs unresolved as the outcome and victim age, sex and race (as just defined) as predictors.
+
 ``` r
 balt <- homicide1 %>% 
   filter(city_state == "Baltimore, MD")
@@ -97,6 +104,12 @@ fit
     ## 4 victim_racenon-white -0.820     0.175       -4.69 2.68e- 6
 
 ``` r
+save(fit,file = "fit_glm.RData") #Save the output of glm as an R object
+```
+
+Obtain the estimate and confidence interval of the adjusted odds ratio for solving homicides comparing non-white victims to white victims keeping all other variables fixed.
+
+``` r
 fit <- fit %>% 
   mutate(OR = exp(estimate),
          CI_low = exp(estimate - std.error*1.96),
@@ -112,6 +125,10 @@ fit
 | victim\_age           |     -0.01|  0.99|     0.99|    1.00|
 | victim\_sexMale       |     -0.89|  0.41|     0.32|    0.54|
 | victim\_racenon-white |     -0.82|  0.44|     0.31|    0.62|
+
+Comment:The estimate OR for race is 0.44(95%CI:0.31,0.62). Interpretation: the odds of resolving the case for non-white people is 0.441 times the odds compared to white people.
+
+Run glm for each of the cities in your dataset, and extract the adjusted odds ratio (and CI) for solving homicides comparing non-white victims to white victims.
 
 ``` r
 city_logistic = function(x){
@@ -133,6 +150,8 @@ city_result =
   unnest
 ```
 
+Create a plot that shows the estimated ORs and CIs for each city.
+
 ``` r
 city_result %>% 
   ggplot(aes(x = reorder(city_state, OR), y = OR)) +
@@ -148,7 +167,12 @@ city_result %>%
 
 <img src="ds_hw6_files/figure-markdown_github/unnamed-chunk-5-1.png" width="90%" />
 
+Comment: The OR differs from state to state, but the mean odds ratio of solving for a non-white victim case compared to white victime is less than 1, which means non-white victim cases are more likely to be unsolved. Boston has the smallest OR, Tampa has the largest OR, Durham has the largest CI.
+
 Problem 2
+=========
+
+In this probelm, we analyzed data gathered to understand the effects of several variables on a child’s birthweight.
 
 ``` r
 birthweight<- read_csv("./data/birthweight.csv") 
@@ -250,62 +274,11 @@ describe(birthweight)
     ## smoken     60.00  2.22     5.38 0.11
     ## wtgain    135.00  0.43     2.74 0.17
 
+Use psych package to check distributions, pnumlbw and pnumsga are all zero, and other variables do not have missing data.
+
 ``` r
 fit_full = lm(bwt ~ .,data = birthweight)
-summary(fit_full)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = bwt ~ ., data = birthweight)
-    ## 
-    ## Residuals:
-    ##      Min       1Q   Median       3Q      Max 
-    ## -1081.29  -184.01    -4.34   174.29  2425.18 
-    ## 
-    ## Coefficients: (3 not defined because of singularities)
-    ##               Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept) -6201.9274   668.2669  -9.281  < 2e-16 ***
-    ## babysex        32.3397     8.5490   3.783 0.000157 ***
-    ## bhead         134.4216     3.4705  38.733  < 2e-16 ***
-    ## blength        76.3778     2.0384  37.469  < 2e-16 ***
-    ## delwt           3.9571     0.3989   9.921  < 2e-16 ***
-    ## fincome         0.6543     0.1776   3.684 0.000232 ***
-    ## frace          -5.8678     8.7969  -0.667 0.504788    
-    ## gaweeks        12.0387     1.4809   8.129 5.59e-16 ***
-    ## malform        14.2400    71.4190   0.199 0.841969    
-    ## menarche       -4.2630     2.9242  -1.458 0.144957    
-    ## mheight         4.7511    10.4062   0.457 0.648002    
-    ## momage          3.4425     1.1930   2.886 0.003927 ** 
-    ## mrace         -48.1943     9.9575  -4.840 1.34e-06 ***
-    ## parity         89.8788    40.9290   2.196 0.028147 *  
-    ## pnumlbw             NA         NA      NA       NA    
-    ## pnumsga             NA         NA      NA       NA    
-    ## ppbmi          -0.9683    15.0322  -0.064 0.948642    
-    ## ppwt           -2.6603     2.6384  -1.008 0.313354    
-    ## smoken         -3.7220     0.5819  -6.396 1.76e-10 ***
-    ## wtgain              NA         NA      NA       NA    
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 275.5 on 4325 degrees of freedom
-    ## Multiple R-squared:  0.7116, Adjusted R-squared:  0.7105 
-    ## F-statistic:   667 on 16 and 4325 DF,  p-value: < 2.2e-16
-
-``` r
-library(MASS)
-```
-
-    ## 
-    ## Attaching package: 'MASS'
-
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     select
-
-``` r
-step.model <- step(fit_full,direction =c("both"), trace = FALSE)
-summary(step.model)
+step(fit_full, direction="backward",trace = 0)
 ```
 
     ## 
@@ -314,32 +287,15 @@ summary(step.model)
     ##     gaweeks + menarche + mheight + momage + mrace + parity + 
     ##     ppwt + smoken, data = birthweight)
     ## 
-    ## Residuals:
-    ##      Min       1Q   Median       3Q      Max 
-    ## -1081.54  -184.11    -3.95   174.35  2425.63 
-    ## 
     ## Coefficients:
-    ##               Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept) -6246.3672   143.1342 -43.640  < 2e-16 ***
-    ## babysex        32.3171     8.5453   3.782 0.000158 ***
-    ## bhead         134.4298     3.4681  38.761  < 2e-16 ***
-    ## blength        76.3760     2.0376  37.484  < 2e-16 ***
-    ## delwt           3.9564     0.3985   9.929  < 2e-16 ***
-    ## fincome         0.6597     0.1773   3.721 0.000201 ***
-    ## gaweeks        12.0396     1.4803   8.133 5.42e-16 ***
-    ## menarche       -4.3140     2.9211  -1.477 0.139792    
-    ## mheight         5.4408     1.8125   3.002 0.002699 ** 
-    ## momage          3.4549     1.1923   2.898 0.003778 ** 
-    ## mrace         -53.4990     6.0167  -8.892  < 2e-16 ***
-    ## parity         89.9677    40.9125   2.199 0.027929 *  
-    ## ppwt           -2.8323     0.4367  -6.486 9.79e-11 ***
-    ## smoken         -3.7116     0.5814  -6.384 1.90e-10 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 275.5 on 4328 degrees of freedom
-    ## Multiple R-squared:  0.7116, Adjusted R-squared:  0.7107 
-    ## F-statistic: 821.4 on 13 and 4328 DF,  p-value: < 2.2e-16
+    ## (Intercept)      babysex        bhead      blength        delwt  
+    ##  -6246.3672      32.3171     134.4298      76.3760       3.9564  
+    ##     fincome      gaweeks     menarche      mheight       momage  
+    ##      0.6597      12.0396      -4.3140       5.4408       3.4549  
+    ##       mrace       parity         ppwt       smoken  
+    ##    -53.4990      89.9677      -2.8323      -3.7116
+
+Using backward method to select model.
 
 ``` r
 my_model = lm(bwt ~ babysex + bhead + blength + gaweeks + mheight + mrace + parity + smoken,data = birthweight)
@@ -378,7 +334,9 @@ par(mfrow = c(2,2))#check assumption
 plot(my_model)
 ```
 
-<img src="ds_hw6_files/figure-markdown_github/unnamed-chunk-9-1.png" width="90%" />
+<img src="ds_hw6_files/figure-markdown_github/unnamed-chunk-8-1.png" width="90%" />
+
+According to article'European Journal of Obstetrics & Gynecology and Reproductive Biology' and 'Maternal pregravid weight, age, and smoking status as risk factors for low birth weight births' and from the result of backward selection, we finally decide to choose babysex, bhead, blength, gaweeks, mheight, mrace, parity and smoken as predictors in our final model. Q-Q plot is roughly linear, the assumption is not violated.
 
 ``` r
 birthweight %>% 
@@ -393,7 +351,9 @@ birthweight %>%
    )
 ```
 
-<img src="ds_hw6_files/figure-markdown_github/unnamed-chunk-10-1.png" width="90%" />
+<img src="ds_hw6_files/figure-markdown_github/unnamed-chunk-9-1.png" width="90%" />
+
+Comment: the residuals are clusteredd, we need to revise the model.
 
 ``` r
 model1 <- lm(bwt ~ blength + gaweeks, data = birthweight)
@@ -486,4 +446,4 @@ cv_compare %>%
    )
 ```
 
-<img src="ds_hw6_files/figure-markdown_github/unnamed-chunk-13-1.png" width="90%" />
+<img src="ds_hw6_files/figure-markdown_github/unnamed-chunk-12-1.png" width="90%" /> Comment: Based on the RMSE, the my\_model have the least mean rmse and least error variance across these three models. The first model with only parameters in linear form has the least predictive ability. The second model involving main effect of baby head circumference, body length, babysex and their interactions have better predictive capability than the first one.
