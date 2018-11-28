@@ -23,7 +23,7 @@ set.seed(1)
 
 #Problem 1
 
-Create a city_state variable (e.g. “Baltimore, MD”), and a binary variable indicating whether the homicide is solved. Omit cities Dallas, TX; Phoenix, AZ; and Kansas City, MO – these don’t report victim race. Also omit Tulsa, AL – this is a data entry mistake. Modifiy victim_race to have categories white and non-white, with white as the reference category. 
+Create a city_state variable, and a binary variable indicating whether the homicide is solved. Omit cities Dallas, TX; Phoenix, AZ; and Kansas City, MO, these do not report victim race. Also omit Tulsa, AL this is a data entry mistake. Modifiy victim_race to have categories white and non-white, with white as the reference category. 
 
 ```{r}
 homicide <- 
@@ -105,8 +105,8 @@ city_result %>%
 
 ```
 
-Comment: The OR differs from state to state, but the mean odds ratio of solving for a non-white victim case compared to white victime is less than 1, which means
-non-white victim cases are more likely to be unsolved.
+Comment: The OR differs from state to state, but the mean odds ratio of solving for a non-white victim case compared to white victime is less than 1, which means non-white victim cases are more likely to be unsolved.
+Boston has the smallest OR, Tampa has the largest OR.
 
 
 
